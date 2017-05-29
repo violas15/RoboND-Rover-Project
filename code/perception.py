@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 
 # Identify pixels below the threshold
-def obstacle_thresh(img,rgb_thresh=(161,161,161)):
+def obstacle_thresh(img,rgb_thresh=(160,160,160)):
     color_select = np.zeros_like(img[:,:,0])
     # Require that each pixel be above all three threshold values in RGB
     # above_thresh will now contain a boolean array with "True"
@@ -21,8 +21,8 @@ def sample_thresh(img):
     # Require that each pixel be above all three threshold values in RGB
     # above_thresh will now contain a boolean array with "True"
     # where threshold was met
-    below_thresh = (img[:,:,0] > 110) \
-                & (img[:,:,1] > 110) \
+    below_thresh = (img[:,:,0] > 105) \
+                & (img[:,:,1] > 105) \
                 & (img[:,:,2] < 100)
     # Index the array of zeros with the boolean array and set to 1
     color_select[below_thresh] = 1
@@ -30,15 +30,15 @@ def sample_thresh(img):
     return color_select
 
 # Threshold of RGB > 160 does a nice job of identifying ground pixels only
-def color_thresh(img, rgb_thresh=(160, 160, 160)):
+def color_thresh(img, rgb_thresh=(180, 180, 180)):
     # Create an array of zeros same xy size as img, but single channel
     color_select = np.zeros_like(img[:,:,0])
     # Require that each pixel be above all three threshold values in RGB
     # above_thresh will now contain a boolean array with "True"
     # where threshold was met
     above_thresh = (img[:,:,0] > rgb_thresh[0]) \
-                & (img[:,:,1] > rgb_thresh[1]) \
-                & (img[:,:,2] > rgb_thresh[2])
+                | (img[:,:,1] > rgb_thresh[1]) \
+                | (img[:,:,2] > rgb_thresh[2])
     # Index the array of zeros with the boolean array and set to 1
     color_select[above_thresh] = 1
     # Return the binary image
@@ -111,6 +111,13 @@ def perception_step(Rover):
     # Perform perception steps to update Rover()
     # TODO: 
     # NOTE: camera image is coming to you in Rover.img
+    PITCHTHRESH = .5 #from 0
+    ROLLTHRESH = .5 #from 0
+
+    pitch = min(abs(Rover.pitch), abs(Rover.pitch -360))
+    roll = min(abs(Rover.roll), abs(Rover.roll -360))
+    print("Pitch: ", pitch, "Roll: ", roll)
+#don't update if pitch isnt correct
     image = Rover.img
     # 1) Define source and destination points for perspective transform
     dst_size = 5 
@@ -131,9 +138,12 @@ def perception_step(Rover):
     obstacles = obstacle_thresh(warped)
     samples = sample_thresh(warped)
     # 4) Update Rover.vision_image (this will be displayed on left side of screen)
-    Rover.vision_image[:,:,0] = obstacles
-    Rover.vision_image[:,:,1] = samples
-    Rover.vision_image[:,:,2] = navigable
+     # Example: Rover.vision_image[:,:,0] = obstacle color-thresholded binary image
+        #          Rover.vision_image[:,:,1] = rock_sample color-thresholded binary image
+        #          Rover.vision_image[:,:,2] = navigable terrain color-thresholded binary image
+    Rover.vision_image[:,:,0] = obstacles*255
+    Rover.vision_image[:,:,1] = samples*255
+    Rover.vision_image[:,:,2] = navigable*255
 
     # 5) Convert map image pixel values to rover-centric coords
     xNavPix, yNavPix  = rover_coords(navigable)
@@ -149,17 +159,18 @@ def perception_step(Rover):
                                     Rover.yaw, Rover.worldmap.shape[0], 10)
 
     # 7) Update Rover worldmap (to be displayed on right side of screen)
-    Rover.worldmap[worldObsy, worldObsx, 0] += 1
-    Rover.worldmap[worldSampley, worldSamplex, 1] += 1
-    Rover.worldmap[worldNavy, worldNavx, 2] += 1
+    if(abs(pitch) < PITCHTHRESH and abs(roll) < ROLLTHRESH):
+        Rover.worldmap[worldObsy, worldObsx, 0] += 1
+        Rover.worldmap[worldSampley, worldSamplex, 1] += 1
+        Rover.worldmap[worldNavy, worldNavx, 2] += 1
 
     # 8) Convert rover-centric pixel positions to polar coordinates
     distance,angles = to_polar_coords(xNavPix, yNavPix)
     # Update Rover pixel distances and angles
     Rover.nav_dists = distance
     Rover.nav_angles = angles
-    
- 
-    
-    
+        
+     
+        
+        
     return Rover

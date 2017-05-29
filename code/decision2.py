@@ -25,7 +25,7 @@ def decision_step(Rover):
     if Rover.nav_angles is not None:
         distanceThresh = 1.5
         # Check for Rover.mode status
-        offset = 5
+        offset = 7
         xCenter = (int) (Rover.vision_image.shape[1]/2)
 
         canNav = Rover.vision_image[:,xCenter-offset:xCenter+offset,2] #strip of the image that if we drive straight we will be good
@@ -70,8 +70,8 @@ def decision_step(Rover):
             if distance >=distanceThresh:
                 print ("forward:", distance)
                 setVelocity(Rover, distance*distance/10)
-                angle = np.min(Rover.nav_angles * 180/np.pi) +45  #+43
-                Rover.steer = np.clip(np.mean(Rover.nav_angles * 180/np.pi)*.1 + angle*.9,-15,15)
+                angle = np.mean (Rover.nav_angles * 180/np.pi)# +45  #+43
+                Rover.steer = np.clip(angle,-15,15)
                 print ("Steering: ", angle)
                 print("Min angle: ", np.min(Rover.nav_angles* 180/np.pi))
             else:
