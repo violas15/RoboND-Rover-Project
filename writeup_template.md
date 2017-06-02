@@ -26,10 +26,11 @@
 [image2]: ./calibration_images/example_grid1.jpg
 [image3]: ./calibration_images/example_rock1.jpg 
 [image4]: ./output/exampleWarp,threshold,rover.png
-[image5]: ./autonomousRun1/Mapped.8_fid.65.png
-[image6]: ./autonomousRun1/Mapped.4_fid.7.png
-[image7]: ./output/realData4pics.png
-[image8]: ./autonomousRun1/3colorThreshold.png
+
+[image5]: ./autonomousRun1/Mapped.8_fid.65.PNG
+[image6]: ./autonomousRun1/Mapped.4_fid.7.PNG
+[image7]: ./output/realData4pics.PNG
+[image8]: ./autonomousRun1/3colorThreshold.PNG
 
 
 
@@ -82,17 +83,17 @@ You're reading it!
 
 ##### The decision_step() function remained similar to the original however some modifications were made to allow for more consistent mapping. The 2 main differences were in how the rover decided to stop and how it chose the correct steering angle. For deciding when to stop I used the rover vision image which was already thresholded and warped and found the furthest navigable set of points that were at least the width of the rover. This happened by scanning down from the top of the image, looking only at the center column that was 10 pixels wide. As soon as 10 pixels were all blue, ie navigable terrain, the distance from an object was set to the height of that row/10. Every 10 pixels corresponded to a single meter so this method returned how far forward the rover could drive and not hit anything.
 
-##### The second major change was in the steering decision. I decided to try and follow the rightmost wall the entire time to map out the entire location. On first try I decided to use only the minimum value of the valid vision angles similar to how the original algorithm used the average of all of the angles to decide a steering angle. The minimum angle then had a constant added to it to create a minimum angle to the right wall to be considered close enough to go straight. This method was not very successful as the rover would often get too close to the wall and stop slowing the process immensely. Instead I finally decided to use a weighted average between the minimum angle and the average angle to create a steering algorithm that would try and navigate to the space with the most navigable terrain but always tend towards the right. This worked very well as in places with multiple paths to take it always chose to take the right most path consistent with what wall following expected. The images in Movie and Movie2 show this process taking place. 
+##### The second major change was in the steering decision. I decided to try and follow the rightmost wall the entire time to map out the entire location. On first try I decided to use only the minimum value of the valid vision angles similar to how the original algorithm used the average of all of the angles to decide a steering angle. The minimum angle then had a constant added to it to create a minimum angle to the right wall to be considered close enough to go straight. This method was not very successful as the rover would often get too close to the wall and stop slowing the process immensely. Instead If finally decided to use a weighted average between the minimum angle and the average angle to create a steering algorithm that would try and navigate to the space with the most navigable terrain but always tend towards the right. This worked very well as in places with multiple paths to take it always chose to take the right most path consistent with what wall following expected. The images in Movie and Movie2 show this process taking place. 
 
 
 #### 2. Launching in autonomous mode your rover can navigate and map autonomously.  Explain your results and how you might improve them in your writeup.  
 
 ##### All of the testing in autonomous mode was done at a resolution of 600x800 with fantastic graphics running at 24fps. From the testing I was able to successfully map over 80% of the map at a fidelity of 65%. The steering algorithm explained above combined with the perception step were fairly robust in the ability to navigate and did not often get stuck in a location and consistenly mapped the large majority of the available terrain. There were certain small offshoots that it would tend to overlook due to the weighted average not tending hard enough towards the right, but increasing this value caused the rover to drive to close to the wall and stop more frequently. Overall the performance was acceptable however there is much room for improvement.
 
-###### The perception and decision functions were effective at mapping but there was no real way to tell the Rover to stop and pickup a sample using this method. This approach is more feasible for general wandering around the map however additional states would need to be added in order to collect samples and return to the start. Another improvement that could help prevent missing any offshoots is rather than use weighted averages to try and tend towards the wall, I could use the global map the Rover is actively creating to determine the distance to the rightmost wall. This could then be used to always remain a set distance from the right wall and would be much more robust than the method I chose. 
+##### The perception and decision functions were effective at mapping but there was no real way to tell the Rover to stop and pickup a sample using this method. This approach is more feasible for general wandering around the map however additional states would need to be added in order to collect samples and return to the start. Another improvement that could help prevent missing any offshoots is rather than use weighted averages to try and tend towards the wall, I could use the global map the Rover is actively creating to determine the distance to the rightmost wall. This could then be used to always remain a set distance from the right wall and would be much more robust than the method I chose. 
 
 
-###### Here are 2 pictures of the progression of the map in autonomous mode.
+##### Here are 2 pictures of the progression of the map in autonomous mode.
 
 ![alt text][image6]
 
