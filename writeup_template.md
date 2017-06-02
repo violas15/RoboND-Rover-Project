@@ -25,10 +25,10 @@
 [image1]: ./misc/rover_image.jpg
 [image2]: ./calibration_images/example_grid1.jpg
 [image3]: ./calibration_images/example_rock1.jpg 
-[image4]: ./output/"Test Data"/exampleWarp,threshold,rover.png
+[image4]: ./output/Test_Data/exampleWarp,threshold,rover.png
 
 [image5]: ./autonomousRun1/Mapped.8_fid.65.PNG
-[image6]: ./autonomousRun1/Mapped.4_fid.7.PNG
+[image6]: ./autonomousRun1/mapped.8_fid.65.PNG
 [image7]: ./output/realData4pics.png
 
 [image8]: ./autonomousRun1/3colorThreshold.PNG
